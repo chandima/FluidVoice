@@ -1,4 +1,4 @@
-FluidVoice #1362: transcribe a meeting when the host ends the Zoom call (MeetingRecoveryTests)
+FluidVoice #1362: transcribe a meeting when the host ends the Zoom call
 Environment: public main ff14861 (FluidVoice 1.6.13 source), macOS 27.2.1, Apple Silicon arm64, Xcode 27.2
 
 BEFORE: main + new tests + new event case, without auto-transcription (bug behaviour)
@@ -7,22 +7,21 @@ BEFORE: main + new tests + new event case, without auto-transcription (bug behav
             XCTAssertEqual failed: ("interrupted") is not equal to ("completed")
             XCTAssertTrue failed - No attempt may stay pending
             XCTAssertEqual failed: ("Optional(FluidVoice_Debug.MeetingProcessingStage.pending)") is not equal to ("Optional(FluidVoice_Debug.MeetingProcessingStage.completed)")
-  PASSED  testSourceApplicationEndedWithoutFinalizedAudioStaysInterrupted()
-  PASSED  testUnexpectedStopPublishesQuiescenceAfterDelayedAudioHandback()
 
-AFTER: with the fix (1abbfd2), full Fluid scheme (xcodebuild test)
+AFTER: head 0332977 (Xcode suite run on 68595cf; 0332977 changes only Python harnesses)
   PASSED  testSourceApplicationEndedTranscribesPreservedAudioWithoutManualRetry()
   PASSED  testSourceApplicationEndedWithoutFinalizedAudioStaysInterrupted()
   PASSED  testUnexpectedStopPublishesQuiescenceAfterDelayedAudioHandback()
-  Full suite: 2801 tests, 2736 passed, 0 failed, 65 skipped (environment-gated: signing identity / opt-in fixtures)
-  e92cbe8 (final; differs from 1abbfd2 only in comments): MeetingRecoveryTests + MeetingAutoDetectorTests 284 tests, 282 passed, 0 failed, 2 skipped
-
-FOLLOW-UP edd1551: capture-engine decision (MeetingCaptureEvent.rebuildExhausted)
   PASSED  testExhaustedRecoveryEndsMeetingOnlyWhenTheMeetingAppIsUnavailable()
-  MeetingRecoveryTests + MeetingAutoDetectorTests: 285 tests, 283 passed, 0 failed, 2 skipped
-  Mutation check, applicationUnavailable branch removed: FAILED (as required)
-            failed - An unavailable meeting app must end the meeting, got interrupted(kind: FluidVoice_Debug.MeetingInterruptionKind.captureStoppedUnexpectedly, trackID: nil, detail: Opti
+  PASSED  testRecoveryTellsAGoneAppFromSeveralRunningCopies()
+  Full Fluid scheme: 2803 tests, 2738 passed, 0 failed, 65 skipped (environment-gated: signing identity / opt-in fixtures)
+  Tests/run_ci_checks.sh harnesses (every run_check except formatting/lint): 19/19 passed (main: 19/19)
+
+Mutation checks (fix removed -> test must fail)
+  FAILED  testExhaustedRecoveryEndsMeetingOnlyWhenTheMeetingAppIsUnavailable()  [applicationUnavailable branch removed]
+  FAILED  testRecoveryTellsAGoneAppFromSeveralRunningCopies()  [ambiguity mapping removed]
+  FAILED  run_meeting_computer_audio_tests.py  [ambiguity mapping removed: applicationUnavailable("Chrome")]
 
 Lint/format
-  swiftlint 0.63.2 --strict --config .swiftlint.yml Sources Tests Package.swift: 0 violations in 612 files (edd1551)
-  swiftformat 0.64.7 --lint --config .swiftformat on changed files: same 214 findings as main, none new
+  swiftlint 0.63.2 --strict --config .swiftlint.yml Sources Tests Package.swift: 0 violations in 612 files
+  swiftformat 0.64.7 --lint --config .swiftformat on changed sources: same findings as main, none new
