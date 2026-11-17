@@ -1,0 +1,21 @@
+FluidVoice: transcribe meetings when the meeting app quits (MeetingRecoveryTests)
+Environment: public main ff14861 (FluidVoice 1.6.13 source), macOS 27.2.1, Apple Silicon arm64, Xcode 27.2
+
+BEFORE: main + new tests + new event case, without auto-transcription (bug behaviour)
+  FAILED  testSourceApplicationEndedTranscribesPreservedAudioWithoutManualRetry()
+            XCTAssertEqual failed: ("interrupted(E49B20DA-9590-4613-BA4F-4E6A73877CC5)") is not equal to ("completed(E49B20DA-9590-4613-BA4F-4E6A73877CC5)") - Ended source must not wait f
+            XCTAssertEqual failed: ("interrupted") is not equal to ("completed")
+            XCTAssertTrue failed - No attempt may stay pending
+            XCTAssertEqual failed: ("Optional(FluidVoice_Debug.MeetingProcessingStage.pending)") is not equal to ("Optional(FluidVoice_Debug.MeetingProcessingStage.completed)")
+  PASSED  testSourceApplicationEndedWithoutFinalizedAudioStaysInterrupted()
+  PASSED  testUnexpectedStopPublishesQuiescenceAfterDelayedAudioHandback()
+
+AFTER: with the fix, full Fluid scheme (xcodebuild test)
+  PASSED  testSourceApplicationEndedTranscribesPreservedAudioWithoutManualRetry()
+  PASSED  testSourceApplicationEndedWithoutFinalizedAudioStaysInterrupted()
+  PASSED  testUnexpectedStopPublishesQuiescenceAfterDelayedAudioHandback()
+  Full suite: 2801 tests, 2736 passed, 0 failed, 65 skipped (environment-gated: signing identity / opt-in fixtures)
+
+Lint/format
+  swiftlint 0.63.2 --strict --config .swiftlint.yml Sources Tests Package.swift: 0 violations in 612 files
+  swiftformat 0.64.7 --lint --config .swiftformat on changed files: same 214 findings as main, none new
