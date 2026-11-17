@@ -1980,6 +1980,12 @@ private final nonisolated class ScreenCaptureMeetingRuntime: NSObject, MeetingCa
             return true
         }
         guard shouldReport else { return }
+        // Recovery found no running instance of the meeting app (for example Zoom quit when the
+        // call ended). Nothing can resume this capture, so report it as the end of the meeting.
+        if case MeetingCaptureError.applicationUnavailable = triggeringError {
+            self.eventHandler(.sourceApplicationEnded(detail: triggeringError.localizedDescription))
+            return
+        }
         self.eventHandler(.interrupted(
             kind: .captureStoppedUnexpectedly,
             trackID: nil,
