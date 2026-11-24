@@ -10,13 +10,21 @@ BEFORE: main + the new and updated tests, committer unchanged (bug behaviour)
             XCTAssertEqual failed: ("Optional([...unprotected])") is not equal to ("Optional([...unprotected, ...unprotected])")
             XCTAssertTrue failed - a full writer queue drops a sample; it must not stop the meeting
 
-AFTER: head 3b1c413
+AFTER: head 4097f27
   PASSED  testCommitterRecoversAfterTransientWriterOverflow()
   PASSED  testCommitterWriterOverflowDemotesInMemoryWithoutStoppingCapture()
   PASSED  testCommitterPromotionQueueFullStaysUnprotectedWithoutStoppingCapture()
-  MeetingAEC3Tests: 45 tests, 45 passed, 0 failed
+  PASSED  testCommitterStopsWhenTheEmergencyDemotionCannotBeSaved()      (6d1a0d4, review)
+  PASSED  testWriterRefusesPromotionWhileEmergencyDemotionIsPending()    (4097f27, review)
+  MeetingAEC3Tests: 47 tests, 47 passed, 0 failed
   Tests/run_ci_checks.sh (GITHUB_ACTIONS=true, unsigned): PASS: complete CI sequence
-  Full Fluid scheme: 2840 tests, 2777 passed, 0 failed, 63 skipped (environment-gated: signing identity / opt-in fixtures)
+  Full Fluid scheme: 2842 tests, 2779 passed, 0 failed, 63 skipped (environment-gated: signing identity / opt-in fixtures)
+
+Mutation checks (review fix removed -> its test must fail)
+  FAILED  testCommitterStopsWhenTheEmergencyDemotionCannotBeSaved()  [emergency save back to try? + queueFull]
+            XCTAssertEqual failed: ("[]") is not equal to ("[...metadataPersistence]")
+  FAILED  testWriterRefusesPromotionWhileEmergencyDemotionIsPending()  [promotion guard removed]
+            XCTAssertTrue failed - a promotion must not queue behind a pending emergency
 
 Lint/format
   swiftlint 0.63.2 --strict --config .swiftlint.yml Sources Tests Package.swift: 0 violations in 622 files
