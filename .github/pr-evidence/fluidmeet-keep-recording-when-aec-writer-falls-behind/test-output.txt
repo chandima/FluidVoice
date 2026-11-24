@@ -1,0 +1,23 @@
+FluidVoice #1412: keep recording when the echo-cancelled microphone writer falls behind
+Environment: public main c81c83c (FluidVoice 1.6.13 source), macOS 27.2.1, Apple Silicon arm64, Xcode 27.2
+
+BEFORE: main + the new and updated tests, committer unchanged (bug behaviour)
+  FAILED  testCommitterRecoversAfterTransientWriterOverflow()
+            XCTAssertTrue failed - a transient writer stall must not stop the meeting
+  FAILED  testCommitterWriterOverflowDemotesInMemoryWithoutStoppingCapture()
+            XCTAssertTrue failed - a full writer queue drops a sample; it must not stop the meeting
+  FAILED  testCommitterPromotionQueueFullStaysUnprotectedWithoutStoppingCapture()
+            XCTAssertEqual failed: ("Optional([...unprotected])") is not equal to ("Optional([...unprotected, ...unprotected])")
+            XCTAssertTrue failed - a full writer queue drops a sample; it must not stop the meeting
+
+AFTER: head 3b1c413
+  PASSED  testCommitterRecoversAfterTransientWriterOverflow()
+  PASSED  testCommitterWriterOverflowDemotesInMemoryWithoutStoppingCapture()
+  PASSED  testCommitterPromotionQueueFullStaysUnprotectedWithoutStoppingCapture()
+  MeetingAEC3Tests: 45 tests, 45 passed, 0 failed
+  Tests/run_ci_checks.sh (GITHUB_ACTIONS=true, unsigned): PASS: complete CI sequence
+  Full Fluid scheme: 2840 tests, 2777 passed, 0 failed, 63 skipped (environment-gated: signing identity / opt-in fixtures)
+
+Lint/format
+  swiftlint 0.63.2 --strict --config .swiftlint.yml Sources Tests Package.swift: 0 violations in 622 files
+  swiftformat 0.61.1 --lint --config .swiftformat Sources: 0/432 files require formatting
